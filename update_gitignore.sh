@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # List of directories to exclude the gitignore updation
-excludedDirectories="private-files/ samples/"
+excludedDirectories="gitignore/ private-files/ samples/"
 
 # Change to root directory
 cd ..
@@ -23,6 +23,18 @@ for dir in */; do
 
     # Pull from the remote
     git pull origin main
+
+    # Remove current gitignore file
+    rm .gitignore
+
+    # Copy gitignore from the repo
+    cp ../gitignore/.gitignore .
+
+    # Add the updated gitignore file
+    git add .gitignore
+
+    # Commit the changes
+    git commit -m "[TECH] updated gitignore"
 
     # Push the latest commits
     git push origin main
