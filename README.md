@@ -4,6 +4,17 @@
 
 A repo with `.gitignore` file to be used across other repos.
 
+# Script
+
+Use the script file to automatically update the `.gitignore` file for all the sibling repos.
+
+    ./update_gitignore.sh
+
+### Side Effects
+
+1. The local git branch will be switched to the main branch.
+2. Might lead to rebase conflicts.
+
 # Ignored files
 
 1. Mac OS
