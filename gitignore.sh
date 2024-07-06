@@ -11,8 +11,7 @@ cd ..
 
 # Function to update gitignore for a single repository
 update_gitignore() {
-  
-  local dir=$1
+  local dir="$1"
 
   # Change to that subdirectory
   cd "$dir"
@@ -58,10 +57,8 @@ export -f update_gitignore
 
 # Iterate over all directories
 for dir in */; do
-
   # Skip directories in exclude directories
-  if [[ ${excludedDirectories} != *"$dir"* ]];then
-
+  if [[ ${excludedDirectories} != *"$dir"* ]]; then
     # Run update_gitignore function in parallel for each directory
     update_gitignore "$dir" &
   fi
