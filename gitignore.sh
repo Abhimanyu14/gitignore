@@ -15,7 +15,7 @@ update_gitignore() {
   local dir=$1
 
   # Change to that subdirectory
-  cd $dir
+  cd "$dir"
 
   # Stash local changes
   git stash >/dev/null 2>&1
