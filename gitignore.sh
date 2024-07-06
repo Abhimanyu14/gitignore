@@ -67,6 +67,9 @@ for dir in */; do
   fi
 done
 
+# Wait for all background jobs to complete
+wait
+
 # Record the end time
 end_time=$(date +%s)
 
