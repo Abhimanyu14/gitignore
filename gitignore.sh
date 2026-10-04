@@ -4,7 +4,11 @@
 start_time=$(date +%s)
 
 # List of directories to exclude the gitignore updation
-excludedDirectories="gitignore/ private-files/ samples/"
+excludedDirectories=(
+  "gitignore/"
+  "private-files/"
+  "samples/"
+)
 
 # Change to root directory
 cd ..
@@ -58,7 +62,7 @@ export -f update_gitignore
 # Iterate over all directories
 for dir in */; do
   # Skip directories in exclude directories
-  if [[ ${excludedDirectories} != *"$dir"* ]]; then
+  if [[ ! " ${excludedDirectories[*]} " =~ " ${dir} " ]]; then
     # Run update_gitignore function in parallel for each directory
     update_gitignore "$dir" &
   fi
