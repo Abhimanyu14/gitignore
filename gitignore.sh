@@ -56,9 +56,6 @@ update_gitignore() {
   cd ..
 }
 
-# Export the function to make it available to parallel
-export -f update_gitignore
-
 # Iterate over all directories
 for dir in */; do
   # Skip directories in exclude directories
