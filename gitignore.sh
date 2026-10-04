@@ -38,8 +38,13 @@ update_gitignore() {
   (
     cd "$repo_path" || exit 0
 
-    # Skip directory if not a Git repository
+    # Fast bail-out 1: Skip non-git directories
     if [ ! -d ".git" ]; then
+      exit 0
+    fi
+
+    # Fast bail-out 2: Skip if .gitignore is ALREADY identical (saves expensive git pull/stash)
+    if [ -f .gitignore ] && cmp -s .gitignore "$GITIGNORE_SRC"; then
       exit 0
     fi
 
@@ -75,7 +80,7 @@ update_gitignore() {
       exit 0
     fi
 
-    # Compare local .gitignore against source template byte-by-byte
+    # Re-verify comparison after pull before committing
     if ! cmp -s .gitignore "$GITIGNORE_SRC"; then
       echo "Updating .gitignore in: $dir"
       cp "$GITIGNORE_SRC" .gitignore
@@ -97,10 +102,10 @@ update_gitignore() {
 export ROOT_DIR GITIGNORE_SRC
 export -f update_gitignore
 
-# Maximum number of concurrent background Git jobs (increase if server/network allows)
-MAX_JOBS=10
+# Higher concurrency limit to restore sub-3s parallel execution speed
+MAX_JOBS=25
 
-# Fast helper function to check active background job count
+# Fast counter for active jobs
 get_job_count() {
   jobs -p | wc -l | tr -d ' '
 }
@@ -109,7 +114,7 @@ get_job_count() {
 for dir_path in */; do
   dir="${dir_path%/}" # Strip trailing slash
 
-  # Exclusion check
+  # Fast array exclusion check
   skip=false
   for excluded in "${excludedDirectories[@]}"; do
     if [ "$dir" = "$excluded" ]; then
@@ -125,10 +130,10 @@ for dir_path in */; do
   # Execute update task asynchronously in background
   update_gitignore "$dir" &
 
-  # Fast low-latency throttling (50ms poll instead of 500ms)
-  while [ "$(get_job_count)" -ge "$MAX_JOBS" ]; do
-    sleep 0.05
-  done
+  # Zero-sleep throttle: Only wait briefly if maximum job threshold is hit
+  if [ "$(get_job_count)" -ge "$MAX_JOBS" ]; then
+    wait -n 2>/dev/null || sleep 0.01
+  fi
 done
 
 # Block main script execution until all remaining background jobs finish
